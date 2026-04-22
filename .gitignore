@@ -12,4 +12,4 @@ coverage/
 *.gif
 *.mp4
 *.zip
-package-lock.json
+# package-lock.json
