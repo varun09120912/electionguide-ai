@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import ChatBubble from '../components/ChatBubble';
 import LoadingDots from '../components/LoadingDots';
 import { getResponse, defaultResponse } from '../data/responses';
@@ -52,9 +53,34 @@ const Chat = () => {
     setInputValue('');
     setIsTyping(true);
 
-    // Simulate AI response delay
-    setTimeout(() => {
-      const responseContent = getResponse(sanitized);
+    const generateAIResponse = async () => {
+      try {
+        const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+        if (apiKey && apiKey.length > 10) {
+          const genAI = new GoogleGenerativeAI(apiKey);
+          const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+          
+          const prompt = `You are a helpful expert on the Indian Election process. Answer the following question simply, factually, and concisely for a general audience. Question: ${sanitized}`;
+          const result = await model.generateContent(prompt);
+          const responseText = result.response.text();
+          
+          return {
+            title: "✨ Google Gemini AI",
+            explanation: responseText,
+            steps: [],
+            footer: "Powered by Google Gemini 1.5 Flash"
+          };
+        } else {
+          // No API key, fallback to offline keyword engine
+          return getResponse(sanitized);
+        }
+      } catch (error) {
+        console.error("Gemini API Error:", error);
+        return getResponse(sanitized); // Fallback on error
+      }
+    };
+
+    generateAIResponse().then((responseContent) => {
       const aiMsg = {
         id: Date.now() + 1,
         isUser: false,
@@ -62,7 +88,7 @@ const Chat = () => {
       };
       setMessages(prev => [...prev, aiMsg]);
       setIsTyping(false);
-    }, 1500);
+    });
   };
 
   const handleKeyDown = (e) => {
