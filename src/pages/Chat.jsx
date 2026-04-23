@@ -165,6 +165,7 @@ const Chat = () => {
         <div className="max-w-2xl lg:max-w-4xl 3xl:max-w-7xl mx-auto relative flex items-center">
           <input
             type="text"
+            aria-label="Ask a question about the election"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value.slice(0, 500))}
             onKeyDown={handleKeyDown}
@@ -174,6 +175,7 @@ const Chat = () => {
           <button
             onClick={() => handleSend()}
             disabled={!inputValue.trim()}
+            aria-label="Send question"
             className={`absolute right-2 p-2 sm:p-3 rounded-full transition-all flex items-center justify-center ${
               inputValue.trim() 
                 ? 'bg-primary-blue text-white shadow-md hover:bg-blue-700 hover:scale-105' 
